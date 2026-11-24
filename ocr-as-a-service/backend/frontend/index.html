@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>OCR-as-a-Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="up" viewBox="0 0 16 16"><path d="M8 10.5v-8M5 5.5l3-3 3 3M2.5 10v2A1.5 1.5 0 0 0 4 13.5h8a1.5 1.5 0 0 0 1.5-1.5v-2"/></symbol>
+<symbol id="cp" viewBox="0 0 16 16"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-1A1.5 1.5 0 0 0 9 3H4a1.5 1.5 0 0 0-1.5 1.5V9A1.5 1.5 0 0 0 4 10.5h1.5"/></symbol>
+<symbol id="ck" viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7"/></symbol>
+<symbol id="dl" viewBox="0 0 16 16"><path d="M8 2.5v8M5 7.5l3 3 3-3M2.5 11v1A1.5 1.5 0 0 0 4 13.5h8a1.5 1.5 0 0 0 1.5-1.5v-1"/></symbol>
+<symbol id="x" viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8"/></symbol>
+<symbol id="al" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01"/></symbol>
+<symbol id="im" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.5"/><circle cx="5.75" cy="6.5" r="1"/><path d="m2.5 11.5 3.5-3 3 2.5 2-1.5 2.5 2"/></symbol>
+<symbol id="tx" viewBox="0 0 16 16"><path d="M3 4h10M3 8h10M3 12h6"/></symbol>
+<symbol id="ch" viewBox="0 0 16 16"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></symbol>
+<symbol id="su" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.75"/><path d="M8 1.5v1.25M8 13.25v1.25M1.5 8h1.25M13.25 8h1.25M3.4 3.4l.9.9M11.7 11.7l.9.9M12.6 3.4l-.9.9M4.3 11.7l-.9.9"/></symbol>
+<symbol id="mo" viewBox="0 0 16 16"><path d="M13 9.4A5.5 5.5 0 0 1 6.6 3 5.5 5.5 0 1 0 13 9.4z"/></symbol>
+</defs></svg>
+
+<header class="top"><div class="bar">
+  <a class="brand" href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="currentColor"/><path d="M7 10V8.5A1.5 1.5 0 0 1 8.5 7H10M14 7h1.5A1.5 1.5 0 0 1 17 8.5V10M17 14v1.5a1.5 1.5 0 0 1-1.5 1.5H14M10 17H8.5A1.5 1.5 0 0 1 7 15.5V14M10 12h4" fill="none" stroke="var(--bg)" stroke-width="1.5" stroke-linecap="round"/></svg>OCR-as-a-Service</a>
+  <nav aria-label="Primary"><a href="#" aria-current="page">Playground</a><a href="#api">API</a></nav>
+  <div class="pop">
+    <button class="pill" id="pillBtn" aria-haspopup="true" aria-expanded="false"><span class="dot wait" id="dot"></span><span id="pillTxt">Checking…</span><svg class="i"><use href="#ch"/></svg></button>
+    <div class="menu" id="menu" hidden>
+      <label for="base">API endpoint</label>
+      <div class="row"><input id="base" spellcheck="false" autocomplete="off"><button class="btn sm" id="saveBase">Test</button></div>
+      <p>Start the service with <code>docker compose up --build</code>, then use the host port mapped by Compose.</p>
+    </div>
+  </div>
+  <button class="icon-btn" id="theme" aria-label="Toggle theme"><svg class="i"><use id="themeUse" href="#mo"/></svg></button>
+</div></header>
+
+<main>
+  <div class="hero">
+    <div>
+      <span class="eyebrow">OCR workspace</span>
+      <h1>Extract text from images</h1>
+      <p class="lede">Upload an image and turn it into clean, searchable text. Processing runs securely inside your Docker container.</p>
+    </div>
+    <div class="hero-meta" aria-label="Service details">
+      <span><span class="meta-dot"></span>Local processing</span>
+      <span>Tesseract OCR</span>
+    </div>
+  </div>
+
+  <div class="ws">
+    <section class="panel" aria-labelledby="h-in">
+      <div class="ph"><h2 id="h-in">Image</h2><span class="hint">PNG, JPG or WebP, up to 10 MB</span></div>
+      <div class="pb">
+        <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose an image to upload">
+          <div class="well"><svg class="i"><use href="#up"/></svg></div>
+          <strong>Drop an image here</strong>
+          <span class="s">or click to browse. You can also paste a screenshot with Ctrl+V.</span>
+        </div>
+        <div class="prev" id="prev" hidden>
+          <div class="frame"><img id="img" alt="Selected image preview"></div>
+          <div class="chip"><svg class="i"><use href="#im"/></svg><span class="n" id="fn"></span><span class="m" id="fm"></span>
+            <span class="sp"><button class="btn sm" id="replace">Replace</button><button class="icon-btn" style="height:30px;width:30px" id="clear" aria-label="Remove image"><svg class="i"><use href="#x"/></svg></button></span></div>
+        </div>
+        <p class="err-inline" id="fileErr" role="alert" hidden></p>
+        <input type="file" id="file" accept="image/*" hidden>
+      </div>
+      <div class="pf"><button class="btn primary" id="go" disabled>Extract text</button><span id="hintGo">Select an image to begin</span></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-out">
+      <div class="ph"><h2 id="h-out">Extracted text</h2>
+        <span class="accuracy" id="accuracy" hidden title="Estimated OCR confidence">
+          <span class="accuracy-dot"></span>
+          <span id="accuracyValue">--%</span>
+          <span class="accuracy-label">accuracy</span>
+        </span>
+        <div class="tabs" role="tablist" aria-label="Output format"><button role="tab" id="tT" aria-selected="true">Text</button><button role="tab" id="tJ" aria-selected="false" tabindex="-1">JSON</button></div>
+        <button class="btn sm" id="copy" disabled><svg class="i"><use id="copyUse" href="#cp"/></svg><span id="copyTxt">Copy</span></button>
+        <button class="icon-btn" style="height:30px;width:30px" id="dl" disabled aria-label="Download as .txt"><svg class="i"><use href="#dl"/></svg></button>
+      </div>
+      <div class="pb" id="outBody" aria-live="polite">
+        <div class="empty"><svg class="i" style="width:20px;height:20px"><use href="#tx"/></svg><strong>No text yet</strong><span>Results appear here after you extract an image.</span></div>
+      </div>
+      <div class="pf mono" id="meta" style="font-variant-numeric:tabular-nums">Waiting for an image</div>
+    </section>
+  </div>
+
+  <section class="api" id="api">
+    <h2>Use the API</h2>
+    <p>Send the image as multipart form data in a field named <code>image</code>. The response is JSON with <code>extracted_text</code>.</p>
+    <div class="code"><pre id="curl"></pre><button class="btn sm" id="copyCurl" aria-label="Copy curl command"><svg class="i"><use href="#cp"/></svg>Copy</button></div>
+  </section>
+</main>
+<footer>Sudhanshu Pawar, Parth Gade & Kaustubh Darade. Container Based Application Development, MIT-ADT University.</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
